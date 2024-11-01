@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实训控制台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f0f2f5;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            margin-top: 0;
+        }
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .header {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            margin-bottom: 20px;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .chart {
+            width: 100%;
+            height: 200px;
+            background-color: #ecf0f1;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>实训控制台</h2>
+        <ul>
+            <li><a href="#dashboard">仪表盘</a></li>
+            <li><a href="#courses">课程管理</a></li>
+            <li><a href="#students">学员管理</a></li>
+            <li><a href="#reports">报告</a></li>
+            <li><a href="#settings">设置</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <div class="header">
+            <h1>欢迎回来，{{ user }}</h1>
+        </div>
+        <div class="dashboard">
+            <div class="card">
+                <h3>通知</h3>
+                <ul id="notice"></ul>
+            </div>
+            <div class="card">
+                <h3>未完成实训</h3>
+                <ul id="no-train"></ul>
+            </div>
+            <div class="card">
+                <h3>我的资料</h3>
+                <p>我的班级：<strong>{{ data['class'] }}</strong></p>
+                <p>我的权限：<strong>{{ data['group'] }}</strong></p>
+                <p>我的积分：<strong>{{ data['score'] }}</strong></p>
+            </div>
+        </div>
+    </div>
+<script>
+        async function fetchNotice() {
+            try {
+                const response = await fetch('/api/v1/notice'); // 替换为实际API URL
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                const userList = document.getElementById('notice');
+                data.forEach(notice => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = notice.content;
+                    userList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+        fetchNotice();
+    </script>
+<script>
+        async function fetchNoTrain() {
+            try {
+                const response = await fetch('/api/v1/no_train'); // 替换为实际API URL
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                const userList = document.getElementById('no-train');
+                data.forEach(data => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = data.content;
+                    userList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Fetch error:', error);
+            }
+        }
+        fetchNoTrain();
+    </script>
+</body>
+</html>
