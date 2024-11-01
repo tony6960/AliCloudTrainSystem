@@ -46,7 +46,7 @@ def api_v1_notice():
 @app.route('/api/v1/no_train')
 def api_v1_no_train():
     token = request.cookies.get('token')
-    return [{'content': 'Train Test'}]
+    return get_no_train(token, user_list, cursor)
 
 
 if __name__ == '__main__':
