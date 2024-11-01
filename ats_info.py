@@ -16,7 +16,7 @@ def get_notice(token, user_list, cursor):
     temp = []
     cookie_check_result = cookie_checker(token, user_list)
     if cookie_check_result:
-        cursor.execute('SELECT content,from_user from ats_notice where class=?', (cookie_check_result['obj'].get_class(cursor),))
+        cursor.execute("SELECT content,from_user from ats_notice where class=? OR class='all'", (cookie_check_result['obj'].get_class(cursor),))
         notice_back_result = cursor.fetchall()
         for notice in notice_back_result:
             temp.append({'content': notice[0] + '-' + notice[1]})
@@ -29,7 +29,7 @@ def get_no_train(token, user_list, cursor):
     temp = []
     cookie_check_result = cookie_checker(token, user_list)
     if cookie_check_result:
-        cursor.execute('SELECT name,list FROM ats_train where class=?', (cookie_check_result['obj'].get_class(cursor),))
+        cursor.execute("SELECT name,list FROM ats_train where class=? OR class='all'", (cookie_check_result['obj'].get_class(cursor),))
         train_back_result = cursor.fetchall()
         for train in train_back_result:
             if cookie_check_result['name'] in ast.literal_eval(train[1])['nofinish']:
