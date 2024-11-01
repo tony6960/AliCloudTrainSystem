@@ -8,5 +8,10 @@ def index():
     return 'Hello World!'
 
 
+@app.route('/login')
+def login():
+    pass
+
+
 if __name__ == '__main__':
     app.run()
