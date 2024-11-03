@@ -12,8 +12,23 @@ def user_login_checker(user, passwd, cursor):
         return False
 
 
+def temp_user_req_id_checker(req_id, temp_user_list):
+    for user in temp_user_list:
+        if user.req_id == req_id:
+            return user
+    return False
+
+
 def cookie_checker(token, user_list):
     for user in user_list:
         if user.token == token:
             return {'obj': user, 'name': user.username}
     return {'obj': False, 'name': False}
+
+
+def user_is_existence_checker(username, cursor):
+    cursor.excute("SELECT username from ats_user where username=?", (username,))
+    result = cursor.fetchone()
+    if result:
+        return True
+    return False
