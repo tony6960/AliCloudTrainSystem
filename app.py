@@ -3,6 +3,7 @@ import sqlite3
 from ats_checker import *
 from ats_info import *
 import uuid
+from ats_db import *
 
 app = Flask(__name__)
 conn = sqlite3.connect('ATS.db', check_same_thread=False)
@@ -23,7 +24,7 @@ def index():
         return redirect(url_for('login'))
     cookie_check_result = cookie_checker(token, user_list)['name']
     if cookie_check_result:
-        return render_template('index.html', user=cookie_check_result, data=index_data_create(cookie_check_result, user_list, cursor))
+        return render_template('index.html', user=cookie_check_result, data=index_data_create(cookie_check_result, user_list, create_conn_cursor()))
     return redirect(url_for('login'))
 
 
@@ -39,7 +40,7 @@ def login():
     else:
         username = request.form.get('username')
         password = request.form.get('password')
-        login_check_result = user_login_checker(username, password, cursor)
+        login_check_result = user_login_checker(username, password, create_conn_cursor())
         if login_check_result:
             user_list.append(login_check_result['user'])
             response = make_response(redirect(url_for('index')))
@@ -52,13 +53,13 @@ def login():
 @app.route('/api/v1/notice')
 def api_v1_notice():
     token = request.cookies.get('token')
-    return get_notice(token, user_list, cursor)
+    return get_notice(token, user_list, create_conn_cursor())
 
 
 @app.route('/api/v1/no_train')
 def api_v1_no_train():
     token = request.cookies.get('token')
-    return get_no_train(token, user_list, cursor)
+    return get_no_train(token, user_list, create_conn_cursor())
 
 
 @app.route('/api/v1/login_back')
@@ -69,12 +70,14 @@ def api_v1_login_back():
     user_class = request.form.get('class')
     user = temp_user_req_id_checker(req_id, temp_user_list)
     if user:
-        if user_is_existence_checker(name, cursor):
+        if user_is_existence_checker(name, create_conn_cursor()):
             token = uuid.uuid4().hex
             user_list.append(User(name, token))
             response = {'token': token, 'user': name}
             return jsonify(response)
-        user.create_new_user(name, int(score), user_class, cursor, conn)
+        tmp_conn = create_conn()
+        tmp_cursor = tmp_conn.cursor()
+        user.create_new_user(name, int(score), user_class, tmp_cursor, tmp_conn)
         token = uuid.uuid4().hex
         user_list.append(User(name, token))
         response = {'token': token, 'user': name}
